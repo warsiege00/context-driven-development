@@ -1,0 +1,9 @@
+---
+description: Guidelines de tecnologia em /docs/guidelines. Use quando a tarefa envolver uma tecnologia com guideline documentada.
+alwaysApply: false
+---
+
+# Guidelines de tecnologia
+
+Para tarefas envolvendo tecnologias com guideline em /docs/guidelines,
+leia o arquivo correspondente antes de escrever código.
