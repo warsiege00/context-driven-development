@@ -103,6 +103,8 @@ O CDD resolve isso tratando o repositório do projeto como a memória persistent
 
 ## Fluxo de trabalho
 
+Para um passo a passo completo com projeto de exemplo (app de tarefas), veja **[docs/tutorial.md](docs/tutorial.md)** — material de apoio neste repositório.
+
 | Etapa | Onde |
 |-------|------|
 | Descoberta | Chat externo (exploração, pesquisa, tradeoffs) |
