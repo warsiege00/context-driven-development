@@ -107,7 +107,9 @@ Para um passo a passo completo com projeto de exemplo (app de tarefas), veja **[
 
 | Etapa | Onde |
 |-------|------|
-| Descoberta | Chat externo (exploração, pesquisa, tradeoffs) |
+| Descoberta conceitual | Você pesquisa; chat com IA estrutura em `docs/discovery/` |
+| Descoberta de tecnologia | Chat com IA debate stack e arquitetura → `docs/discovery/` |
+| Contexto do projeto | IA preenche, você revisa → `docs/CONTEXT.md` |
 | Arquitetura | Cursor + contexto do codebase existente |
 | Formalizar arquitetura | skill `architecture-writer` → `/docs/architecture/` |
 | Documentar decisão | skill `adr-writer` → `/docs/adr/` |

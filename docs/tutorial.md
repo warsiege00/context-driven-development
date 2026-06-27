@@ -11,13 +11,7 @@ Este tutorial percorre o fluxo completo do Context-Driven Development usando um 
 
 Você está construindo o **TaskFlow**: um app web onde usuários criam listas de tarefas, marcam itens como concluídos e filtram por status. A primeira feature a entregar é **"CRUD de tarefas"**.
 
-Stack escolhida (apenas para o exemplo):
-
-- Next.js 15 (App Router)
-- SQLite via Drizzle ORM
-- Vitest para testes
-
-O código ainda não existe. O que existe é o repositório com CDD instalado (`npx cdd init`).
+O código ainda não existe. O que existe é o repositório com CDD instalado (`npx cdd init`). Stack, arquitetura e convenções ainda não foram definidas — isso acontece **depois** da descoberta, nas etapas seguintes deste tutorial.
 
 ---
 
@@ -25,19 +19,23 @@ O código ainda não existe. O que existe é o repositório com CDD instalado (`
 
 ```mermaid
 flowchart LR
-    A[Descoberta] --> B[Decisão + ADR]
-    B --> C[Arquitetura]
-    C --> D[Spec]
-    D --> E[Implementation Plan]
-    E --> F[Implementar]
-    F --> G[Validar]
-    G --> H[Atualizar CONTEXT / pitfalls]
+    A[Descoberta conceitual] --> B[Descoberta de tecnologia]
+    B --> C[CONTEXT.md]
+    C --> D[ADR]
+    D --> E[Arquitetura]
+    E --> F[Spec]
+    F --> G[Implementation Plan]
+    G --> H[Implementar]
+    H --> I[Validar]
+    I --> J[Atualizar CONTEXT / pitfalls]
 ```
 
 | Etapa | Quem faz | Artefato |
 |-------|----------|----------|
-| Descoberta | Você | Notas em `docs/discovery/` |
-| Decisão arquitetural | Você | Conversa + ADR |
+| Descoberta conceitual | Você pesquisa; agente estrutura | `docs/discovery/` (ex.: `taskflow.md`) |
+| Descoberta de tecnologia | Você + agente debatem stack | `docs/discovery/` (ex.: `taskflow-tech.md`) |
+| Contexto do projeto | Agente preenche; você revisa | `docs/CONTEXT.md` |
+| Decisão arquitetural | Você valida; agente registra | `docs/adr/` |
 | Formalizar arquitetura | Agente | `docs/architecture/` |
 | Escrever spec | Agente | `docs/specs/` |
 | Aprovar spec | Você | Status `aprovado` na spec |
@@ -60,9 +58,9 @@ Após a instalação, a estrutura relevante fica assim:
 ```
 taskflow/
   docs/
-    CONTEXT.md              ← preencher primeiro
+    CONTEXT.md              ← preencher após discovery (Etapa 2)
     pitfalls.md
-    discovery/
+    discovery/              ← começar aqui (Etapa 1)
     architecture/
     specs/
     adr/
@@ -73,15 +71,186 @@ taskflow/
     skills/
 ```
 
-**Regra de ouro:** antes de pedir código, preencha o `CONTEXT.md`. Sem isso, o agente inventa convenções a cada sessão.
+**Regra de ouro:** antes de pedir código, conclua a descoberta e preencha o `CONTEXT.md`. Sem isso, o agente inventa convenções a cada sessão.
 
 ---
 
-## Etapa 1: Preencher o CONTEXT.md
+## Etapa 1: Descoberta
 
-O `CONTEXT.md` é o ponto de entrada de toda sessão. Mantenha curto — só o que o agente erraria sem orientação.
+A descoberta é a **primeira etapa** do CDD — e acontece em duas fases, nesta ordem:
 
-Exemplo para o TaskFlow:
+1. **Descoberta conceitual** — o que você está construindo, para quem, por quê
+2. **Descoberta de tecnologia** — com que stack e arquitetura você vai construir
+
+Só depois das duas fases você tem insumos suficientes para preencher o `CONTEXT.md` e, em seguida, gerar ADRs, arquitetura, specs e código.
+
+### 1.1 Pesquisar e clarear a ideia (você, sem IA)
+
+Antes de abrir o chat com a IA, invista tempo entendendo o problema:
+
+- Pesquise o domínio, concorrentes e referências
+- Esclareça a ideia geral — sozinho ou, se estiver em time, em debates com as pessoas envolvidas
+- Anote hipóteses, dúvidas e pontos em aberto
+
+**Não pule esta fase.** A IA estrutura o que você já pensou — não substitui o pensamento inicial.
+
+### 1.2 Discovery conceitual (você + IA)
+
+Com a ideia mais clara, abra um chat com a IA e escreva de forma **natural** tudo que você ou seu time imaginou: ideias, conceitos, referências, coisas em aberto, público-alvo, escopo do MVP, o que fica fora, etc.
+
+**Prompt sugerido:**
+
+```
+Quero estruturar a descoberta conceitual do meu projeto. Aqui está tudo
+que pensei até agora, em linguagem natural:
+
+[cole suas notas, ideias, debates do time, referências, dúvidas...]
+
+Antes de gerar qualquer arquivo, faça perguntas sobre o que não ficou
+claro. Só depois das minhas respostas, crie um arquivo de discovery
+conceitual em docs/discovery/[nome-do-projeto].md com: visão geral,
+problema, solução proposta, escopo do MVP, hipóteses a validar,
+pontos abertos e próximos passos sugeridos.
+```
+
+**Sempre peça para a IA perguntar o que não ficou claro.** Isso evita que ela preencha lacunas com suposições suas.
+
+O arquivo gerado será um dos insumos para o `CONTEXT.md` e para os demais artefatos do projeto.
+
+#### Exemplo: discovery conceitual do TaskFlow
+
+Suponha que você descreveu o TaskFlow em linguagem natural. Após a IA fazer perguntas e você responder, ela gera `docs/discovery/taskflow.md`:
+
+```markdown
+# Discovery — TaskFlow
+
+**Data:** 27/06/2026
+**Status:** Ideação inicial / Pré-MVP
+**Autor:** [seu nome]
+
+## 1. Visão geral
+
+TaskFlow é um app web de listas de tarefas pessoais. O usuário cria itens,
+marca como concluídos e filtra por status — sem complexidade de projetos,
+tags ou colaboração. O foco do MVP é validar se uma interface mínima e
+direta resolve o dia a dia de quem só precisa anotar e riscar tarefas.
+
+## 2. Problema
+
+Pessoas que usam notas no celular ou papel para tarefas do dia enfrentam:
+
+- Listas que viram bagunça — sem status claro do que já foi feito
+- Ferramentas existentes (Notion, Trello) são pesadas para uso pessoal simples
+- Falta de feedback visual ao concluir uma tarefa
+
+## 3. Solução proposta
+
+- Lista única de tarefas com título e status (pending / done)
+- Criar, concluir/reabrir e excluir com poucos cliques
+- Ordenação automática: mais recentes primeiro
+- Estado vazio amigável quando não há tarefas
+
+**Diferencial central:** zero configuração — abrir e usar.
+
+## 4. Escopo do MVP
+
+**Dentro:** CRUD básico de tarefas, alternar status, listagem ordenada,
+estado vazio, validação de título.
+
+**Fora:** autenticação, múltiplas listas, edição de título, tags, filtros
+avançados, confirmação antes de excluir.
+
+## 5. Hipóteses a validar
+
+| Hipótese | Como validar |
+|----------|--------------|
+| Lista única sem login basta para uso pessoal | Teste com 5–10 usuários reais |
+| Alternar status é a ação mais frequente | Analytics de uso pós-lançamento |
+| Interface mínima gera mais adoção que feature-rich | Comparação com protótipo alternativo |
+
+## 6. Pontos abertos / decisões pendentes
+
+- Single-user local vs conta desde o início
+- Edição de título entra no MVP ou fica para v2?
+- Filtro por status na v1 ou só listagem completa?
+
+## 7. Próximos passos sugeridos
+
+- Validar escopo do MVP com 2–3 potenciais usuários
+- Prototipar wireframe da tela principal
+- Definir discovery de tecnologia (stack, deploy)
+- Priorizar feature "CRUD de tarefas" como primeira entrega
+```
+
+Este documento captura o **produto** — não a stack. A tecnologia vem na fase seguinte.
+
+### 1.3 Discovery de tecnologia (você + IA)
+
+**Só depois** de ter o discovery conceitual revisado e aprovado por você, debata stack, arquitetura e tradeoffs técnicos com a IA.
+
+**Prompt sugerido:**
+
+```
+Leia @docs/discovery/taskflow.md (ou o discovery conceitual do meu projeto).
+
+Agora quero fazer a descoberta de tecnologia: stack, arquitetura, tradeoffs
+e decisões técnicas pendentes. Faça perguntas sobre restrições que eu não
+mencionei (time, prazo, experiência do time, deploy, custo). Depois das
+minhas respostas, crie docs/discovery/[nome]-tech.md com as alternativas
+consideradas, recomendações e pontos ainda em aberto.
+```
+
+#### Exemplo: discovery de tecnologia do TaskFlow
+
+Para o TaskFlow (nosso exemplo ao longo do tutorial), após o discovery conceitual você debate tecnologia e gera `docs/discovery/taskflow-tech.md`:
+
+```markdown
+# Discovery de tecnologia — TaskFlow
+
+**Data:** 27/06/2026
+**Discovery conceitual relacionado:** taskflow.md
+
+## Restrições
+- MVP single-user, sem autenticação nesta versão
+- Time familiar com React/TypeScript
+- Deploy simples para demo
+
+## Tradeoffs discutidos
+
+| Decisão | Alternativas | Escolha preliminar | Motivo |
+|---------|--------------|-------------------|--------|
+| Mutações | REST API / Server Actions / tRPC | Server Actions | Menos boilerplate para UI acoplada ao Next.js |
+| Banco | PostgreSQL / SQLite | SQLite | Basta para dev e demo; migração futura possível |
+| ORM | Prisma / Drizzle | Drizzle | Leve, type-safe, bom com SQLite |
+| Testes | Jest / Vitest | Vitest | Rápido, integração natural com Vite |
+
+## Stack recomendada
+- Next.js 15 (App Router)
+- SQLite via Drizzle ORM
+- Vitest + Testing Library
+
+## Pontos em aberto
+- Quando migrar para PostgreSQL (se houver multi-usuário)
+- Estratégia de deploy (Vercel vs self-hosted)
+```
+
+**Importante:** arquivos em `docs/discovery/` são mantidos manualmente. O agente ajuda a estruturar, mas a validação final é sua.
+
+---
+
+## Etapa 2: Preencher o CONTEXT.md
+
+Com os arquivos de discovery (conceitual + tecnologia) prontos, peça à IA para preencher o `CONTEXT.md`. Este arquivo é o ponto de entrada de toda sessão de implementação — mantenha curto, só o que o agente erraria sem orientação.
+
+**Prompt no Cursor:**
+
+```
+Leia @docs/discovery/taskflow.md e @docs/discovery/taskflow-tech.md.
+Preencha @docs/CONTEXT.md com stack, decisões preliminares, convenções
+e módulos principais. Não escreva código ainda.
+```
+
+Exemplo do resultado para o TaskFlow:
 
 ```markdown
 # Contexto do Projeto
@@ -122,44 +291,9 @@ Atualize se algum destes itens mudar:
 - Novo ADR criado
 ```
 
-**Prompt no Cursor (opcional):**
+Revise o que a IA gerou. O `CONTEXT.md` sintetiza os discoveries — não os substitui.
 
-```
-Leia @docs/CONTEXT.md. Estou iniciando o projeto TaskFlow.
-Revise se está completo para começarmos a feature de CRUD de tarefas.
-Não escreva código ainda.
-```
-
----
-
-## Etapa 2: Descoberta
-
-A descoberta acontece **fora do fluxo de implementação** — pode ser num chat separado, numa conversa com o time, ou numa sessão exploratória no Cursor. O objetivo é entender o problema, não gerar código.
-
-Para o TaskFlow, você anotou em `docs/discovery/task-crud.md`:
-
-```markdown
-# Descoberta: CRUD de tarefas
-
-## Problema
-Usuário precisa criar, listar, editar e excluir tarefas numa única lista.
-
-## Requisitos levantados
-- Título obrigatório (1–200 chars)
-- Status: pending | done
-- Ordenação: mais recentes primeiro
-- Sem autenticação nesta versão (single-user local)
-
-## Tradeoffs discutidos
-- REST API vs Server Actions → Actions simplificam para MVP single-user
-- PostgreSQL vs SQLite → SQLite basta para dev e demo
-
-## Decisões tomadas (ainda não formalizadas)
-- Usar Server Actions
-- SQLite + Drizzle
-```
-
-**Importante:** arquivos em `docs/discovery/` são mantidos manualmente. O agente pode ajudar a organizar notas, mas a validação é sua.
+**A partir daqui** — com discovery concluído e `CONTEXT.md` preenchido — você gera ADRs, arquitetura, specs e código. As etapas seguintes assumem esse pré-requisito.
 
 ---
 
@@ -170,7 +304,8 @@ Decisões arquiteturais vão para `docs/adr/`. Se não estão escritas, não exi
 **Prompt no Cursor:**
 
 ```
-Leia @docs/CONTEXT.md e @docs/discovery/task-crud.md.
+Leia @docs/CONTEXT.md, @docs/discovery/taskflow-tech.md e
+@docs/discovery/taskflow.md.
 Use a skill adr-writer para registrar a decisão de usar Server Actions
 para mutações no TaskFlow. Alternativas consideradas: Route Handlers REST
 e tRPC.
@@ -207,7 +342,7 @@ Usar Server Actions do Next.js para todas as mutações de tarefas.
 - Services permanecem testáveis de forma isolada
 ```
 
-Depois, atualize o `CONTEXT.md` com o link para o ADR (como no exemplo da Etapa 1).
+Depois, atualize o `CONTEXT.md` com o link para o ADR (como no exemplo da Etapa 2).
 
 ---
 
@@ -219,7 +354,7 @@ Com a decisão registrada, documente **como** o módulo funciona — componentes
 
 ```
 Leia @docs/CONTEXT.md, @docs/adr/001-server-actions.md e
-@docs/discovery/task-crud.md.
+@docs/discovery/taskflow.md.
 Use a skill architecture-writer para documentar o módulo de tarefas
 em docs/architecture/tasks.md.
 ```
@@ -513,10 +648,11 @@ A segunda feature do TaskFlow poderia ser **"Filtrar tarefas por status"**.
 
 Fluxo resumido:
 
-1. Notas rápidas em `docs/discovery/` (se necessário)
-2. ADR só se houver decisão nova (ex.: URL search params vs state local)
-3. Atualizar `docs/architecture/tasks.md` ou criar seção na spec
-4. Nova spec → aprovar → novo implementation plan → implementar
+1. Discovery conceitual rápido em `docs/discovery/` (se o escopo mudou)
+2. Discovery de tecnologia só se houver decisão técnica nova
+3. ADR se houver decisão arquitetural nova (ex.: URL search params vs state local)
+4. Atualizar `docs/architecture/tasks.md` ou criar seção na spec
+5. Nova spec → aprovar → novo implementation plan → implementar
 
 Features pequenas podem pular arquitetura formal se o módulo já está documentado — use julgamento. O CONTEXT.md e a arquitetura existente já orientam o agente.
 
@@ -526,6 +662,9 @@ Features pequenas podem pular arquitetura formal se o módulo já está document
 
 | Situação | Prompt |
 |----------|--------|
+| Discovery conceitual | `Aqui está minha ideia em linguagem natural: [...]. Faça perguntas sobre o que não ficou claro e depois crie docs/discovery/[nome].md` |
+| Discovery de tecnologia | `Leia @docs/discovery/[nome].md. Debata stack e arquitetura comigo; depois crie docs/discovery/[nome]-tech.md` |
+| Preencher CONTEXT.md | `Leia os arquivos em @docs/discovery/. Preencha @docs/CONTEXT.md. Não escreva código.` |
 | Iniciar sessão de implementação | `Read @docs/CONTEXT.md before starting. We're working on @docs/specs/[spec].md, task [X] in @docs/implementation-plan/[plan].md` |
 | Criar spec | `Use a skill spec-writer para [feature]. Leia @docs/CONTEXT.md e arquitetura relacionada.` |
 | Criar plano | `Spec aprovada em @docs/specs/[spec].md. Use task-breakdown.` |
@@ -539,6 +678,8 @@ Features pequenas podem pular arquitetura formal se o módulo já está document
 
 | Anti-pattern | Por quê |
 |--------------|---------|
+| Pular discovery e ir direto ao CONTEXT.md | O agente inventa stack e escopo sem base |
+| Pular discovery conceitual e debater tecnologia primeiro | Stack sem entender o produto gera decisões erradas |
 | "Implementa o CRUD de tarefas" sem spec | O agente inventa comportamento e padrões |
 | Spec eternamente em rascunho | Sem aprovação, não há contrato claro |
 | Várias tarefas num único prompt | Difícil revisar; erros se acumulam |
@@ -550,14 +691,15 @@ Features pequenas podem pular arquitetura formal se o módulo já está document
 
 ## Resumo
 
-1. **CONTEXT.md** — memória persistente do projeto
-2. **Descoberta** — você explora; notas opcionais em `discovery/`
-3. **ADR** — decisões que o agente não pode inventar
-4. **Arquitetura** — como o módulo se organiza
-5. **Spec aprovada** — o que construir
-6. **Implementation plan** — em que ordem, tarefa por tarefa
-7. **Implementação** — uma tarefa por sessão, com testes
-8. **Validação** — você confere critérios de aceite
-9. **pitfalls + CONTEXT** — o projeto fica mais inteligente a cada erro corrigido
+1. **Descoberta conceitual** — pesquise, debata com o time, descreva em linguagem natural; a IA estrutura em `discovery/`
+2. **Descoberta de tecnologia** — debata stack e arquitetura; a IA registra tradeoffs em `discovery/`
+3. **CONTEXT.md** — sintetiza os discoveries; memória persistente do projeto
+4. **ADR** — decisões que o agente não pode inventar
+5. **Arquitetura** — como o módulo se organiza
+6. **Spec aprovada** — o que construir
+7. **Implementation plan** — em que ordem, tarefa por tarefa
+8. **Implementação** — uma tarefa por sessão, com testes
+9. **Validação** — você confere critérios de aceite
+10. **pitfalls + CONTEXT** — o projeto fica mais inteligente a cada erro corrigido
 
-O TaskFlow é fictício, mas o fluxo é o mesmo para qualquer feature real: **decisões no repositório, execução pelo agente, validação por você.**
+O TaskFlow é fictício, mas o fluxo é o mesmo para qualquer feature real: **descoberta e decisões no repositório, execução pelo agente, validação por você.**
