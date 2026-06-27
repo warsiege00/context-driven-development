@@ -1,0 +1,32 @@
+{
+  "name": "context-driven-dev",
+  "version": "0.1.0",
+  "description": "Context-Driven Development — estrutura de docs, Cursor rules e skills para projetos com agentes de IA",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "cdd": "./bin/cdd.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "install.sh",
+    ".cursor",
+    "docs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "cursor",
+    "ai",
+    "context-driven-development",
+    "cdd",
+    "agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/warsiege00/context-driven-development.git"
+  }
+}
