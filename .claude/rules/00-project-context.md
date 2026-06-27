@@ -1,0 +1,13 @@
+---
+description: Contexto do projeto e erros recorrentes a evitar
+---
+
+# Contexto do projeto
+
+Antes de iniciar qualquer tarefa, leia `docs/CONTEXT.md` para entender
+as decisões arquiteturais e convenções do projeto.
+
+# Erros recorrentes
+
+Antes de implementar qualquer coisa, consulte `docs/pitfalls.md`.
+Se um padrão descrito lá for relevante para a tarefa atual, siga a correção indicada.

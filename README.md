@@ -15,6 +15,20 @@ npm install -D context-driven-dev
 npx cdd init
 ```
 
+Na primeira execução, o comando pergunta qual IA você vai usar:
+
+1. **Cursor** — instala `.cursor/rules/` e `.cursor/skills/`
+2. **Claude Code** — instala `CLAUDE.md`, `.claude/rules/` e `.claude/skills/`
+3. **Codex** — instala `AGENTS.md` e `.agents/skills/`
+
+Para pular a pergunta interativa (CI ou scripts):
+
+```bash
+npx cdd init --platform cursor
+npx cdd init --platform claude
+npx cdd init --platform codex
+```
+
 Para atualizar rules e templates depois de uma nova versão do pacote:
 
 ```bash
@@ -52,9 +66,12 @@ Ou, a partir do diretório do projeto:
 
 O comando `cdd init` (ou `install.sh`) copia:
 
-- `.cursor/rules/` e `.cursor/skills/`
 - `docs/` com templates, guidelines e diretórios vazios (`discovery`, `architecture`, `specs`, `adr`, `implementation-plan`, `guidelines`)
 - `docs/README.md` — este manual, para consulta dentro do projeto
+- Arquivos da plataforma escolhida:
+  - **Cursor:** `.cursor/rules/` e `.cursor/skills/`
+  - **Claude Code:** `CLAUDE.md`, `.claude/rules/` e `.claude/skills/`
+  - **Codex:** `AGENTS.md` e `.agents/skills/`
 
 Por padrão, arquivos que já existem no destino **não são sobrescritos**. Use `--force` para atualizar rules, skills e templates do framework; use `--force-all` para sobrescrever também `CONTEXT.md` e `pitfalls.md`.
 
@@ -179,11 +196,11 @@ Skills são arquivos de instrução estruturados que produzem artefatos consiste
 
 A estrutura de documentação é agnóstica em relação à ferramenta. Cada agente lê um arquivo de entrada diferente, todos apontando para a mesma pasta `/docs`.
 
-| Ferramenta | Ponto de entrada |
-|------------|------------------|
-| Cursor | `.cursor/rules/` |
-| Claude Code | `CLAUDE.md` |
-| Codex | `AGENTS.md` |
+| Ferramenta | Ponto de entrada | Skills |
+|------------|------------------|--------|
+| Cursor | `.cursor/rules/` | `.cursor/skills/` |
+| Claude Code | `CLAUDE.md` + `.claude/rules/` | `.claude/skills/` |
+| Codex | `AGENTS.md` | `.agents/skills/` |
 
 ---
 

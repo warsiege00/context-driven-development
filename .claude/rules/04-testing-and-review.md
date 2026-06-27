@@ -1,0 +1,23 @@
+---
+description: Estratégia de testes e self-review antes de encerrar tarefas
+---
+
+# Testes
+
+Toda implementação de spec deve incluir testes conforme a estratégia
+definida na própria spec e em `docs/guidelines/testing.md`.
+
+Não considere uma tarefa concluída se a estratégia de teste definida
+na spec não foi cumprida.
+
+# Self-review
+
+Antes de encerrar qualquer tarefa, revise o próprio output verificando:
+
+- O código faz exatamente o que a spec define, nem mais nem menos
+- Não há lógica duplicada ou abstrações desnecessárias
+- Casos de borda da spec foram cobertos
+- Os testes cobrem os critérios de aceite
+- Nenhuma convenção de `docs/CONTEXT.md` foi violada
+
+Se algum item não passou, corrija antes de entregar.
